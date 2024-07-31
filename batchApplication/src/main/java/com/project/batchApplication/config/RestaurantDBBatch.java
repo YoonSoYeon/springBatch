@@ -15,8 +15,8 @@ import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.project.batchApplication.listener.ChunkLisener;
@@ -36,11 +36,10 @@ public class RestaurantDBBatch {
 	public FlatFileItemReader<Restaurant> reader() throws Exception {
 		FlatFileItemReader<Restaurant> itemReader = new FlatFileItemReader<>();
 
-		itemReader.setResource(new ClassPathResource("data2.csv"));
+		itemReader.setResource(new ClassPathResource("data.csv"));
 		itemReader.setName("csvReader");
 		itemReader.setLinesToSkip(1);
-		//itemReader.setEncoding("euc-kr");
-		itemReader.setEncoding("utf-8");
+		itemReader.setEncoding("euc-kr");
 		itemReader.setLineMapper(lineMapper());
 
 		return itemReader;
@@ -83,7 +82,7 @@ public class RestaurantDBBatch {
 			FlatFileItemReader<Restaurant> fileReader)
 			throws Exception {
 		return new StepBuilder("restaurantLoadStep", jobRepository)
-				.<Restaurant, Restaurant>chunk(1000, transactionManager)
+				.<Restaurant, Restaurant>chunk(5000, transactionManager)
 				.reader(fileReader)
 				.listener(new ReaderListener()) //read listener
 				.writer(writer())
@@ -100,8 +99,12 @@ public class RestaurantDBBatch {
 
 	@Bean
 	public TaskExecutor taskExecutor() {
-		SimpleAsyncTaskExecutor taskExecutor = new SimpleAsyncTaskExecutor("spring-bach-task-executor");
-		taskExecutor.setConcurrencyLimit(10);
+		ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
+		taskExecutor.setCorePoolSize(4);
+		taskExecutor.setMaxPoolSize(8);
+		taskExecutor.setThreadNamePrefix("async-thread");
+		
+		taskExecutor.setAllowCoreThreadTimeOut(true); 
 		
 		return taskExecutor;
 	}
