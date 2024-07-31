@@ -50,6 +50,9 @@ rewriteBatchedStatements=true는 mysql에서 batchIntert를 하기 위해 필요
 ![image](https://github.com/user-attachments/assets/a975108b-3d87-4632-87d2-c5e3a186d12a)
 
 ## DDL
+
+파일 위치는 [DDL.SQL](https://github.com/YoonSoYeon/springBatch/blob/main/batchApplication/src/main/resources/DDL.SQL) 이다.
+
 ```sql
 
 CREATE TABLE BATCH_JOB_INSTANCE  (
