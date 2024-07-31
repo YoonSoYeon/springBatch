@@ -6,15 +6,15 @@ Spring Batch를 이용하여 CSV 파일 형태의 대용량 데이터를 DB에 �
 이 프로젝트의 기술 스택은 다음과 같다.
 
 ## 기술 스택
-본 프로젝트는 Spring boot 3.3.2와 H2 DB 기반이며, DAL는 Spring Data JPA 기반으로 되어 있는 프로젝트입니다. 
+본 프로젝트는 Spring boot 3.3.2와 MySql DB 기반으로 되어 있는 프로젝트입니다. 
 
 - Java JDK 17
-- Spring Boot 3.3.2 (Spring Framework 6.
-- Spring Batch 5.x
-- Spring Data JPA
-- MySql 8.x
-- Lombok
-- Gradle 8.x
+- Spring Boot 3.3.2 (Spring Framework 6.1.11)
+- Spring Batch 5.1.2
+- Spring Data JPA 3.3.2
+- MySql 8.3.0
+- Lombok 1.18.34
+- Gradle 8.8
 
 ## 설치 및 실행
 
