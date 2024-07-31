@@ -1,0 +1,147 @@
+CREATE TABLE BATCH_JOB_INSTANCE  (
+	JOB_INSTANCE_ID BIGINT  NOT NULL PRIMARY KEY ,
+	VERSION BIGINT ,
+	JOB_NAME VARCHAR(100) NOT NULL,
+	JOB_KEY VARCHAR(32) NOT NULL,
+	constraint JOB_INST_UN unique (JOB_NAME, JOB_KEY)
+) ENGINE=InnoDB;
+
+CREATE TABLE BATCH_JOB_EXECUTION  (
+	JOB_EXECUTION_ID BIGINT  NOT NULL PRIMARY KEY ,
+	VERSION BIGINT  ,
+	JOB_INSTANCE_ID BIGINT NOT NULL,
+	CREATE_TIME DATETIME(6) NOT NULL,
+	START_TIME DATETIME(6) DEFAULT NULL ,
+	END_TIME DATETIME(6) DEFAULT NULL ,
+	STATUS VARCHAR(10) ,
+	EXIT_CODE VARCHAR(2500) ,
+	EXIT_MESSAGE VARCHAR(2500) ,
+	LAST_UPDATED DATETIME(6),
+	constraint JOB_INST_EXEC_FK foreign key (JOB_INSTANCE_ID)
+	references BATCH_JOB_INSTANCE(JOB_INSTANCE_ID)
+) ENGINE=InnoDB;
+
+CREATE TABLE BATCH_JOB_EXECUTION_PARAMS  (
+	JOB_EXECUTION_ID BIGINT NOT NULL ,
+	PARAMETER_NAME VARCHAR(100) NOT NULL ,
+	PARAMETER_TYPE VARCHAR(100) NOT NULL ,
+	PARAMETER_VALUE VARCHAR(2500) ,
+	IDENTIFYING CHAR(1) NOT NULL ,
+	constraint JOB_EXEC_PARAMS_FK foreign key (JOB_EXECUTION_ID)
+	references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
+) ENGINE=InnoDB;
+
+CREATE TABLE BATCH_STEP_EXECUTION  (
+	STEP_EXECUTION_ID BIGINT  NOT NULL PRIMARY KEY ,
+	VERSION BIGINT NOT NULL,
+	STEP_NAME VARCHAR(100) NOT NULL,
+	JOB_EXECUTION_ID BIGINT NOT NULL,
+	CREATE_TIME DATETIME(6) NOT NULL,
+	START_TIME DATETIME(6) DEFAULT NULL ,
+	END_TIME DATETIME(6) DEFAULT NULL ,
+	STATUS VARCHAR(10) ,
+	COMMIT_COUNT BIGINT ,
+	READ_COUNT BIGINT ,
+	FILTER_COUNT BIGINT ,
+	WRITE_COUNT BIGINT ,
+	READ_SKIP_COUNT BIGINT ,
+	WRITE_SKIP_COUNT BIGINT ,
+	PROCESS_SKIP_COUNT BIGINT ,
+	ROLLBACK_COUNT BIGINT ,
+	EXIT_CODE VARCHAR(2500) ,
+	EXIT_MESSAGE VARCHAR(2500) ,
+	LAST_UPDATED DATETIME(6),
+	constraint JOB_EXEC_STEP_FK foreign key (JOB_EXECUTION_ID)
+	references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
+) ENGINE=InnoDB;
+
+CREATE TABLE BATCH_STEP_EXECUTION_CONTEXT  (
+	STEP_EXECUTION_ID BIGINT NOT NULL PRIMARY KEY,
+	SHORT_CONTEXT VARCHAR(2500) NOT NULL,
+	SERIALIZED_CONTEXT TEXT ,
+	constraint STEP_EXEC_CTX_FK foreign key (STEP_EXECUTION_ID)
+	references BATCH_STEP_EXECUTION(STEP_EXECUTION_ID)
+) ENGINE=InnoDB;
+
+CREATE TABLE BATCH_JOB_EXECUTION_CONTEXT  (
+	JOB_EXECUTION_ID BIGINT NOT NULL PRIMARY KEY,
+	SHORT_CONTEXT VARCHAR(2500) NOT NULL,
+	SERIALIZED_CONTEXT TEXT ,
+	constraint JOB_EXEC_CTX_FK foreign key (JOB_EXECUTION_ID)
+	references BATCH_JOB_EXECUTION(JOB_EXECUTION_ID)
+) ENGINE=InnoDB;
+
+CREATE TABLE BATCH_STEP_EXECUTION_SEQ (
+	ID BIGINT NOT NULL,
+	UNIQUE_KEY CHAR(1) NOT NULL,
+	constraint UNIQUE_KEY_UN unique (UNIQUE_KEY)
+) ENGINE=InnoDB;
+
+INSERT INTO BATCH_STEP_EXECUTION_SEQ (ID, UNIQUE_KEY) select * from (select 0 as ID, '0' as UNIQUE_KEY) as tmp where not exists(select * from BATCH_STEP_EXECUTION_SEQ);
+
+CREATE TABLE BATCH_JOB_EXECUTION_SEQ (
+	ID BIGINT NOT NULL,
+	UNIQUE_KEY CHAR(1) NOT NULL,
+	constraint UNIQUE_KEY_UN unique (UNIQUE_KEY)
+) ENGINE=InnoDB;
+
+INSERT INTO BATCH_JOB_EXECUTION_SEQ (ID, UNIQUE_KEY) select * from (select 0 as ID, '0' as UNIQUE_KEY) as tmp where not exists(select * from BATCH_JOB_EXECUTION_SEQ);
+
+CREATE TABLE BATCH_JOB_SEQ (
+	ID BIGINT NOT NULL,
+	UNIQUE_KEY CHAR(1) NOT NULL,
+	constraint UNIQUE_KEY_UN unique (UNIQUE_KEY)
+) ENGINE=InnoDB;
+
+INSERT INTO BATCH_JOB_SEQ (ID, UNIQUE_KEY) select * from (select 0 as ID, '0' as UNIQUE_KEY) as tmp where not exists(select * from BATCH_JOB_SEQ);
+
+CREATE TABLE `restaurant` (
+  `area` double DEFAULT NULL,
+  `deposit` double DEFAULT NULL,
+  `facotry_office_employees` int DEFAULT NULL,
+  `facotry_sales_employess` int DEFAULT NULL,
+  `factory_production_employees` int DEFAULT NULL,
+  `female` int DEFAULT NULL,
+  `head_office_employees` int DEFAULT NULL,
+  `male` int DEFAULT NULL,
+  `positionx` double DEFAULT NULL,
+  `positiony` double DEFAULT NULL,
+  `rent` double DEFAULT NULL,
+  `total_employees` int DEFAULT NULL,
+  `total_size` double DEFAULT NULL,
+  `restaurant_id` bigint NOT NULL,
+  `address` varchar(255) DEFAULT NULL,
+  `approval_date` varchar(255) DEFAULT NULL,
+  `building_owner_name` varchar(255) DEFAULT NULL,
+  `business_name` varchar(255) DEFAULT NULL,
+  `business_type` varchar(255) DEFAULT NULL,
+  `cancel_date` varchar(255) DEFAULT NULL,
+  `closing_date` varchar(255) DEFAULT NULL,
+  `closure_end_date` varchar(255) DEFAULT NULL,
+  `closure_start_date` varchar(255) DEFAULT NULL,
+  `detail_operation_code` varchar(255) DEFAULT NULL,
+  `detail_operation_name` varchar(255) DEFAULT NULL,
+  `grade` varchar(255) DEFAULT NULL,
+  `group_code` varchar(255) DEFAULT NULL,
+  `homepage` varchar(255) DEFAULT NULL,
+  `industry_name` varchar(255) DEFAULT NULL,
+  `is_multiple_users` varchar(255) DEFAULT NULL,
+  `last_modify_time` varchar(255) DEFAULT NULL,
+  `managerment_number` varchar(255) DEFAULT NULL,
+  `operation_code` varchar(255) DEFAULT NULL,
+  `opertaion_name` varchar(255) DEFAULT NULL,
+  `phone_number` varchar(255) DEFAULT NULL,
+  `reopening_date` varchar(255) DEFAULT NULL,
+  `road_address` varchar(255) DEFAULT NULL,
+  `road_zip_code` varchar(255) DEFAULT NULL,
+  `service_id` varchar(255) DEFAULT NULL,
+  `service_name` varchar(255) DEFAULT NULL,
+  `surroud_operation_name` varchar(255) DEFAULT NULL,
+  `traditioal_food` varchar(255) DEFAULT NULL,
+  `tradition_number` varchar(255) DEFAULT NULL,
+  `update_category` varchar(255) DEFAULT NULL,
+  `update_date` varchar(255) DEFAULT NULL,
+  `water_name` varchar(255) DEFAULT NULL,
+  `zip_code` varchar(255) DEFAULT NULL,
+  PRIMARY KEY (`restaurant_id`)
+) ENGINE=InnoDB;
