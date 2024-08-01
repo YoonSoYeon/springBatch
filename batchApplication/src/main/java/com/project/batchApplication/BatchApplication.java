@@ -25,6 +25,7 @@ public class BatchApplication {
 						new JobParametersBuilder()
 						.addString("pathToFile", "data.csv")
 						.addLong("chunkSize", 10000L)
+						.addLong("currentTimeInMillis", System.currentTimeMillis())
 						.toJobParameters());
 			}
 		};

@@ -70,16 +70,14 @@ public class RestaurantDBBatchTest {
 	}
 
 	private JobParameters buildJobParameters(String filePath) {
-		return new JobParametersBuilder()
-				.addString("pathToFile", filePath)
-				.addLong("chunkSize", 5000L)
-				.addLong("currentTimeInMillis", System.currentTimeMillis()).toJobParameters();
+		return buildJobParameters(filePath, 5000L);
 	}
 	
 	private JobParameters buildJobParameters(String filePath, Long chunkSize) {
 		return new JobParametersBuilder()
 				.addString("pathToFile", filePath)
 				.addLong("chunkSize", chunkSize)
-				.addLong("currentTimeInMillis", System.currentTimeMillis()).toJobParameters();
+				.addLong("currentTimeInMillis", System.currentTimeMillis())
+				.toJobParameters();
 	}
 }
