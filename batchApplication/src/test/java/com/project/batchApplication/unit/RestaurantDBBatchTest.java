@@ -38,7 +38,7 @@ public class RestaurantDBBatchTest {
 		this.jdbcTemplate.update("delete from restaurant");
 
 		// when
-		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(buildJobParameters("data2.csv"));
+		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(buildJobParameters("data.csv"));
 
 		// then
 		assertThat(BatchStatus.COMPLETED.toString()).isEqualTo(jobExecution.getExitStatus().getExitCode());
@@ -48,7 +48,7 @@ public class RestaurantDBBatchTest {
 	public void run_status_is_failed_notFoundFile() throws Exception {
 		// given
 		// when
-		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(buildJobParameters("data3.csv"));
+		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(buildJobParameters("no_data.csv"));
 
 		// then
 		assertThat(BatchStatus.FAILED.toString()).isEqualTo(jobExecution.getExitStatus().getExitCode());
@@ -57,21 +57,22 @@ public class RestaurantDBBatchTest {
 	@Test
 	public void step_test() throws Exception {
 		// given
-		Long chunkSize = 50L;
+		Long chunkSize = 10000L;
 		this.jdbcTemplate.update("delete from restaurant");
-		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(buildJobParameters("data2.csv", chunkSize));
+		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(buildJobParameters("data.csv", chunkSize));
 		
 		//when
 		StepExecution stepExecution =  ((List<StepExecution>) jobExecution.getStepExecutions()).get(0);
 		
 		//then
-		assertThat(stepExecution.getReadCount()/chunkSize).isEqualTo(stepExecution.getCommitCount());
+		assertThat(stepExecution.getReadCount()).isEqualTo(2152084);
+		assertThat(stepExecution.getWriteCount()).isEqualTo(2152084);
 	}
 
 	private JobParameters buildJobParameters(String filePath) {
 		return new JobParametersBuilder()
 				.addString("pathToFile", filePath)
-				.addLong("chunkSize", 1000L)
+				.addLong("chunkSize", 5000L)
 				.addLong("currentTimeInMillis", System.currentTimeMillis()).toJobParameters();
 	}
 	
