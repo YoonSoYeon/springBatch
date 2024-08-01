@@ -2,15 +2,16 @@ package com.project.batchApplication.unit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.BeforeEach;
+import java.util.List;
+
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.core.BatchStatus;
-import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.JobParametersBuilder;
+import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.test.JobLauncherTestUtils;
-import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -29,40 +30,55 @@ public class RestaurantDBBatchTest {
 	private JobLauncherTestUtils jobLauncherTestUtils;
 
 	@Autowired
-	private JobRepositoryTestUtils jobRepositoryTestUtils;
-
-	@Autowired
 	private JdbcTemplate jdbcTemplate;
-
-	
-	@BeforeEach
-	public void setup(@Autowired Job jobUnderTest) {
-		this.jobLauncherTestUtils.setJob(jobUnderTest); // this is optional if the job is unique
-		this.jobRepositoryTestUtils.removeJobExecutions();
-	}
 
 	@Test
 	public void successfully_when_no_error() throws Exception {
 		// given
 		this.jdbcTemplate.update("delete from restaurant");
-		JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
 
 		// when
-		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
+		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(buildJobParameters("data2.csv"));
 
 		// then
 		assertThat(BatchStatus.COMPLETED.toString()).isEqualTo(jobExecution.getExitStatus().getExitCode());
 	}
 	
 	@Test
-	public void run_status_is_failed() throws Exception {
+	public void run_status_is_failed_notFoundFile() throws Exception {
 		// given
-		JobParameters jobParameters = this.jobLauncherTestUtils.getUniqueJobParameters();
-
 		// when
-		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(jobParameters);
+		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(buildJobParameters("data3.csv"));
 
 		// then
 		assertThat(BatchStatus.FAILED.toString()).isEqualTo(jobExecution.getExitStatus().getExitCode());
+	}
+	
+	@Test
+	public void step_test() throws Exception {
+		// given
+		Long chunkSize = 50L;
+		this.jdbcTemplate.update("delete from restaurant");
+		JobExecution jobExecution = this.jobLauncherTestUtils.launchJob(buildJobParameters("data2.csv", chunkSize));
+		
+		//when
+		StepExecution stepExecution =  ((List<StepExecution>) jobExecution.getStepExecutions()).get(0);
+		
+		//then
+		assertThat(stepExecution.getReadCount()/chunkSize).isEqualTo(stepExecution.getCommitCount());
+	}
+
+	private JobParameters buildJobParameters(String filePath) {
+		return new JobParametersBuilder()
+				.addString("pathToFile", filePath)
+				.addLong("chunkSize", 1000L)
+				.addLong("currentTimeInMillis", System.currentTimeMillis()).toJobParameters();
+	}
+	
+	private JobParameters buildJobParameters(String filePath, Long chunkSize) {
+		return new JobParametersBuilder()
+				.addString("pathToFile", filePath)
+				.addLong("chunkSize", chunkSize)
+				.addLong("currentTimeInMillis", System.currentTimeMillis()).toJobParameters();
 	}
 }
