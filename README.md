@@ -31,8 +31,9 @@ $ git clone https://github.com/YoonSoYeon/springBatch.git
 **Run**
 
 ```
+$ cd springBatch/batchApplication
 $ gradlew clean && gradlew build
-$ java -jar .\build\libs\batchApplication-0.0.1-SNAPSHOT.jar
+$ java -jar ./build/libs/batchApplication-0.0.1-SNAPSHOT.jar
 ```
 
 application.properties에 mysql에 대한 접속 정보는 다음과 같이 설정되어 있다.
